@@ -25,6 +25,11 @@ This project demos how to build an LLM-powered Q&A system using:
 
 ---
 
+## To run the app:
+- pip install -r requirements.txt
+- python vector.py    # (Run once to build the vector DB)
+- python main.py      # (Start asking questions)
+
 ## What is a Vector Database?
 
 A **vector database** stores high-dimensional vectors (embeddings) instead of traditional rows and columns.
@@ -66,13 +71,7 @@ The reviews with closest vectors (i.e. most similar meaning) are returned.
 ## Examples: 
 
 ### Retrieving values from the vector DB:
-![alt text](document-sample.png)
+![alt text](pics/document-sample.png)
 
 ### Asking questions:
-![alt text](working-sample.png)
-
-
-## To run the app:
-- pip install -r requirements.txt
-- python vector.py    # (Run once to build the vector DB)
-- python main.py      # (Start asking questions)
+![alt text](pics/working-sample.png)

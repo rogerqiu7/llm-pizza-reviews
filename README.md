@@ -11,6 +11,8 @@ This project demos how to build an LLM-powered Q&A system using:
 
 ## How It Works
 
+<img src="pics/chroma.png" alt="alt text" width="50%" height="auto">
+
 1. **Data Ingestion (`vector.py`)**
    - Loads realistic restaurant reviews from a CSV file.
    - Each review is turned into a `Document` with text content, metadata (e.g., rating, date), and a unique ID.

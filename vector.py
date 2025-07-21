@@ -14,13 +14,21 @@ import pandas as pd
 ## load data and set up embeddings
 
 # read in the csv and initialize the embeddings model as mxbai-embed-large
-df = pd.read_csv("realistic_restaurant_reviews.csv")
+df = pd.read_csv("docs/realistic_restaurant_reviews.csv")
 embeddings = OllamaEmbeddings(model="mxbai-embed-large")
 
 ## setup vector store path and check if it exists
 
 # create the local folder where Chroma will persist its vector database
 db_location = "./chrome_langchain_db"
+
+## create a Chroma vector store using the documents and embeddings
+
+vector_store = Chroma( # create a Chroma vector store instance (load existing or create new)
+    collection_name="restaurant_reviews", # name of the collection (like a table name in a database)
+    persist_directory=db_location, # filesystem path where the vector DB is saved or loaded from
+    embedding_function=embeddings # function that converts text into vector embeddings (mxbai-embed-large in this case)
+)
 
 # check if the database already exists, if not, this will be set to True
 #add_documents = not os.path.exists(db_location)
@@ -43,14 +51,6 @@ if add_documents:
         # append the id and document to their lists
         ids.append(str(i))
         documents.append(document)
-
-## create a Chroma vector store using the documents and embeddings
-
-vector_store = Chroma( # create a Chroma vector store instance (load existing or create new)
-    collection_name="restaurant_reviews", # name of the collection (like a table name in a database)
-    persist_directory=db_location, # filesystem path where the vector DB is saved or loaded from
-    embedding_function=embeddings # function that converts text into vector embeddings (mxbai-embed-large in this case)
-)
 
 # if this is the first run (no existing DB), add all the documents and their embeddings
 if add_documents:

@@ -6,7 +6,10 @@ from langchain_core.prompts import ChatPromptTemplate
 from vector import retriever
 
 # create an instance of the local LLM using the "llama3.2" model via Ollamo
-model = OllamaLLM(model="llama3.2")
+model = OllamaLLM(model="llama3.2", temperature=0.2, top_p=0.95)
+# common LLM settings for internal use:
+# temperature: 0.0 to 0.3 → prioritize accuracy and reduce randomness
+# top_p: 0.8 to 0.95 → limit token choices while maintaining some flexibility
 
 # a multi-line prompt that defines the assistant's behavior and inserts user and context inputs
 template = """
@@ -23,17 +26,36 @@ prompt = ChatPromptTemplate.from_template(template)
 chain = prompt | model
 
 # while loop to continuously ask the user for questions until the user types "q" to quit
-while True:
-    print("\n\n-------------------------------")
-    question = input("Ask your question (q to quit): ")
-    print("\n\n")
-    if question == "q":
-        break
-    
-    # use the retriever to get the top 5 semantically relevant reviews from the Chroma DB
-    reviews = retriever.invoke(question)
-    
-    # pass the reviews and the question into the chain and get the model's response
-    result = chain.invoke({"reviews": reviews, "question": question})
-    # print the response from the LLM
-    print(result)
+# only run this part if the script is executed directly (not imported)
+if __name__ == "__main__":
+    while True:
+        print("\n\n-------------------------------")
+        question = input("Ask your question (q to quit): ")
+        print("\n\n")
+        if question == "q":
+            break
+        
+        # use the retriever to get the top 5 semantically relevant reviews from the Chroma DB
+        reviews = retriever.invoke(question)
+        
+        # pass the reviews and the question into the chain and get the model's response
+        result = chain.invoke({"question": question, "reviews": reviews})
+
+        # print the response from the LLM
+        print(result)
+
+# open the log file in append mode (creates it if it doesn't exist)
+with open("rag_log.txt", "a") as f:
+
+    # log the original user question
+    f.write(f"QUESTION: {question}\n")
+
+    # log the header for the retrieved documents
+    f.write("RETRIEVED:\n")
+
+    # write the first 200 characters of each retrieved document to the log
+    for doc in reviews:
+        f.write(f"- {doc.page_content[:200]}...\n")
+
+    # log the generated answer
+    f.write(f"ANSWER: {result}\n\n")

@@ -23,6 +23,7 @@ This project demos how to build an LLM-powered Q&A system using:
    - The user enters a question (e.g., *"What do people think about the crust?"*).
    - The system retrieves the top 5 semantically similar reviews from Chroma.
    - The question and relevant reviews are sent to LLaMA 3 via LangChain.
+   - Parameters of the model can be adjusted like like `temperature` and `top_p` to control diversity and randomness of answers.
    - The model answers using context from the actual reviews.
 
 ---
@@ -31,6 +32,7 @@ This project demos how to build an LLM-powered Q&A system using:
 - pip install -r requirements.txt
 - python vector.py    # (Run once to build the vector DB)
 - python main.py      # (Start asking questions)
+- python eval.py      # (Basic QA testing can be done by feeding predefined questions and checking if the model responds with relevant keywords)
 
 ## What is a Vector Database?
 
@@ -57,17 +59,6 @@ That question is also embedded into a vector like:
 The vector DB compares this vector to all the stored review vectors by similarity.
 
 The reviews with closest vectors (i.e. most similar meaning) are returned.
----
-
-## Vector DB vs SQL / NoSQL
-
-| Feature                | Vector DB (e.g., Chroma)                      | SQL / NoSQL                         |
-|------------------------|-----------------------------------------------|-------------------------------------|
-| **Query type**         | Semantic similarity (e.g., "meaning of text") | Exact match or pattern search       |
-| **Data stored**        | High-dimensional vectors + metadata           | Structured rows / key-value docs    |
-| **Best for**           | Unstructured data: text, images, audio        | Structured/relational or JSON-like  |
-| **Search flexibility** | Can find similar ideas/meanings               | Requires precise schema/keywords    |
-
 ---
 
 ## Examples: 

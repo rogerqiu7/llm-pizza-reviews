@@ -1,5 +1,5 @@
 # import the retrieval and answer generation components from the main module
-from main import chain, retriever
+from app import chain, retriever
 
 # create test questions and expected keywords to validate responses
 test_cases = [

@@ -1,15 +1,34 @@
 # LLM-Pizza-Reviews
-##### Simple RAG (Retrieval-Augmented Generation) pipeline that uses a local LLM and vector database to answer user questions about pizza restaurant reviews based on a provided CSV file.
+A lightweight, containerized RAG (Retrieval-Augmented Generation) app that uses a local LLM and vector database to answer natural language questions about pizza restaurant reviews.
 
-This project demos how to build an LLM-powered Q&A system using:
+This project demonstrates how to build a local LLM-powered Q&A system using:
 
-- **Ollama** to run the LLaMA 3 model locally
-- **LangChain** to structure prompts and connect components
-- **Chroma** (a vector database) to store and retrieve restaurant reviews based on semantic similarity
+- **Ollama** to run models like LLaMA 3.2 locally
+- **LangChain** to structure prompts and manage model input/output
+- **Chroma** as a vector database for semantic retrieval
+- **Docker** for portable, reproducible setup
 
 ---
 
-## How It Works
+
+## Project Structure
+
+```
+project/
+├── app.py               # Main app: prompts user and returns answers
+├── vector_store.py      # Loads reviews and builds semantic index
+├── config.py            # Ollama base URL, model names, DB path
+├── entrypoint.sh        # Starts Ollama and launches the app
+├── Dockerfile           # Container definition
+├── requirements.txt     # Python dependencies
+├── .dockerignore        # Ignore DB logs and cache files
+├── data/
+│   └── realistic_restaurant_reviews.csv
+├── chrome_langchain_db/ # Vector DB (created at runtime)
+└── rag_log.txt          # Conversation log (created at runtime)
+```
+
+## How the app works
 
 <img src="pics/chroma.png" alt="alt text" width="50%" height="auto">
 
@@ -29,36 +48,41 @@ This project demos how to build an LLM-powered Q&A system using:
 ---
 
 ## To run the app:
-- pip install -r requirements.txt
-- python vector.py    # (Run once to build the vector DB)
-- python main.py      # (Start asking questions)
-- python eval.py      # (Basic QA testing can be done by feeding predefined questions and checking if the model responds with relevant keywords)
+**1. Build the container:**
+```bash
+docker build -t pizza-ai .
+```
+
+**2. Run the container interactively:**
+```bash
+docker run --rm -it pizza-ai
+```
+---
+## What Happens When You Run It
+
+1. **The container starts and runs `/app/entrypoint.sh`:**
+   - Launches the Ollama server in the background on port `11434`
+   - Waits for Ollama to become ready (via HTTP check)
+   - Pulls the LLM model and embedding model if not already cached
+   - Starts the app (`python app.py`)
+
+2. **Your app sends requests to Ollama inside the same container:**
+   - Ollama listens on `localhost:11434`
+   - Your Python code sends embed and generate requests via that port
+   - No external network connection is needed — everything is self-contained
+
+---
 
 ## What is a Vector Database?
 
-A **vector database** stores high-dimensional vectors (embeddings) instead of traditional rows and columns.
+Instead of storing data as rows and columns, a vector DB stores **semantic representations** of text — i.e. numeric vectors.
 
-Each piece of text (like a review) is converted into a numeric representation — a **vector** — using an embedding model. These vectors capture **semantic meaning**, so similar meanings are closer together in vector space.
+Example:
+| Review Text                         | Vector (simplified)         |
+|------------------------------------|-----------------------------|
+| “Crust was crispy and delicious.”  | `[0.11, -0.03, 0.82, ...]`  |
 
-### Example:
-
-| Document ID | Review Text                              | Embedding (simplified)                 |
-|-------------|-------------------------------------------|----------------------------------------|
-| 1           | "The crust was crispy and delicious."     | `[0.14, -0.08, 0.91, ...]`             |
-| 2           | "Great service and fast delivery."        | `[0.02, 0.66, -0.51, ...]`             |
-| 3           | "The pizza was too salty and soggy."      | `[0.45, -0.12, 0.75, ...]`             |
-
-When a user asks:
-
-> “How was the pizza?”
-
-That question is also embedded into a vector like:
-
-[0.11, -0.02, 0.79, ..., 0.09]
-
-The vector DB compares this vector to all the stored review vectors by similarity.
-
-The reviews with closest vectors (i.e. most similar meaning) are returned.
+When you ask a question like “How’s the crust?”, your query is converted into a vector and compared to all reviews using vector similarity.
 ---
 
 ## Examples: 
@@ -66,5 +90,8 @@ The reviews with closest vectors (i.e. most similar meaning) are returned.
 ### Retrieving values from the vector DB:
 ![alt text](pics/document-sample.png)
 
-### Asking questions:
-![alt text](pics/working-sample.png)
+### Running the Docker image:
+![alt text](pics/startup.png)
+
+### Example of question and answer:
+![alt text](pics/example.png)

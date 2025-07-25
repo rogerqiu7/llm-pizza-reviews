@@ -1,13 +1,25 @@
+# import os and logging for environment setup and logging
+import os
+import logging
+# import url and model from the config file
+from config import OLLAMA_BASE_URL, MODEL_NAME
 # import the OllamaLLM wrapper, which allows LangChain to use local LLMs through the Ollama runtime
 from langchain_ollama.llms import OllamaLLM
 # ChatPromptTemplate helps create a structured, fill-in-the-blank style prompt for the model
 from langchain_core.prompts import ChatPromptTemplate
 # import the retriever object you previously set up in vector.py (uses Chroma to return relevant reviews)
-from vector import retriever
+from vector_store import retriever
 
-# create an instance of the local LLM using the "llama3.2" model via Ollamo
-model = OllamaLLM(model="llama3.2", temperature=0.2, top_p=0.95)
-# common LLM settings for internal use:
+# set up logging to print INFO level messages to the console
+# this will help you see what the app is doing as it runs
+logging.basicConfig(level=logging.INFO)
+
+# set the base URL so the app can talk to the Ollama server running inside the same Docker container
+# since both the app and Ollama are in the same container, 'localhost' correctly refers to the internal Ollama server  
+os.environ["OLLAMA_BASE_URL"] = OLLAMA_BASE_URL
+
+# create an instance of the local LLM using the model defined in the config file
+model = OllamaLLM(model=MODEL_NAME, temperature=0.2, top_p=0.95)
 # temperature: 0.0 to 0.3 → prioritize accuracy and reduce randomness
 # top_p: 0.8 to 0.95 → limit token choices while maintaining some flexibility
 

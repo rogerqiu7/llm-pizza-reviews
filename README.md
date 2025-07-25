@@ -1,7 +1,7 @@
 # LLM-Pizza-Reviews
-A lightweight, containerized RAG (Retrieval-Augmented Generation) app that uses a local LLM and vector database to answer natural language questions about pizza restaurant reviews.
+A containerized RAG (Retrieval-Augmented Generation) app that uses a local LLM and vector database to answer questions about pizza restaurant reviews.
 
-This project demonstrates how to build a local LLM-powered Q&A system using:
+Tools used:
 
 - **Ollama** to run models like LLaMA 3.2 locally
 - **LangChain** to structure prompts and manage model input/output

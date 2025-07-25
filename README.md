@@ -18,6 +18,7 @@ project/
 ├── app.py               # Main app: prompts user and returns answers
 ├── vector_store.py      # Loads reviews and builds semantic index
 ├── config.py            # Ollama base URL, model names, DB path
+├── eval.py              # Test questions to validate model answers
 ├── entrypoint.sh        # Starts Ollama and launches the app
 ├── Dockerfile           # Container definition
 ├── requirements.txt     # Python dependencies
@@ -32,18 +33,22 @@ project/
 
 <img src="pics/chroma.png" alt="alt text" width="50%" height="auto">
 
-1. **Data Ingestion (`vector.py`)**
-   - Loads realistic restaurant reviews from a CSV file.
-   - Each review is turned into a `Document` with text content, metadata (e.g., rating, date), and a unique ID.
-   - Each document is embedded into a vector using `mxbai-embed-large` via Ollama.
-   - The documents and embeddings are stored in a local Chroma vector database.
+### 1. **Review Indexing (`vector_store.py`)**
+- Loads CSV reviews into memory
+- Uses Ollama’s embedding model (`mxbai-embed-large`) to convert reviews to vectors
+- Stores them in a local Chroma vector DB for fast semantic search
 
-2. **Querying (`main.py`)**
-   - The user enters a question (e.g., *"What do people think about the crust?"*).
-   - The system retrieves the top 5 semantically similar reviews from Chroma.
-   - The question and relevant reviews are sent to LLaMA 3 via LangChain.
-   - Parameters of the model can be adjusted like like `temperature` and `top_p` to control diversity and randomness of answers.
-   - The model answers using context from the actual reviews.
+### 2. **Interactive Q&A (`app.py`)**
+- User enters a question (e.g. _“What do people think about delivery?”_)
+- App finds the top 5 similar reviews using vector search
+- The question and reviews are passed to the LLM via LangChain
+- The LLM returns a relevant answer using review context
+- All questions and responses are logged to `rag_log.txt`
+
+### 3. **Evaluation (`eval.py`)**
+- Contains predefined questions and expected keywords
+- Runs through each question and checks if answers contain relevant content
+- Useful for verifying model performance or changes over time
 
 ---
 
